@@ -1,0 +1,137 @@
+{% load static %}
+{% static "images" as baseUrl %}
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Sample</title>
+    <link rel="stylesheet" href="{% static '/css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a class="btn btn-primary" href="/dashboard">Dashboard</a>
+      <br><br>
+      <div class="main_container" style="text-align: center;">
+        <form class="" action="/plotchart" method="post">
+          {% csrf_token %}
+          <label for="plots">Choose a plot</label>
+          <select class="" name="plots" id = "plots" onchange="askVariables(this)">
+            <option value=""></option>
+            {% for chart in charttypes %}
+              <option value="{{chart.name}}">{{chart.name}}</option>
+            {% endfor %}
+          </select>
+          <br><br>
+          <div class="selectVariables" id="selectVariables" style = "display: none;">
+            <div class="categorical_variables_checkbox" id = "categorical_variables_checkbox">
+              <h5>Select Categorical variables from the chekboxes</h5>
+              <div class="row">
+                {% for variable in categorical_variables %}
+                  <div class="col col-lg-3 col-sm-6">
+                    <label class="cbcontainer">
+                        {{variable.name}}
+                        <input type="checkbox" name="{{variable.name}}" value="{{variable.name}}">
+                        <span class="checkmark"></span>
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="categorical_variables_picklist_div" id = "categorical_variables_picklist_div">
+              <h5>Pick an Categorical variable from the pickist</h5>
+              <select class="categorical_variables_picklist" name="categorical_variables_picklist" id = "categorical_variables_picklist">
+                <option value=""></option>
+                {% for variable in categorical_variables %}
+                  <option value="{{variable.name}}">{{variable.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-check center numerical_variables_checkbox" id = "numerical_variables_checkbox">
+              <h5>Select numerical variables from the chekboxes</h5>
+              {% for variable in numerical_variables %}
+                <input class="form-check-input" type="checkbox" name="{{variable.name}}" value="{{variable.name}}">
+                <label class="form-check-label" for="{{variable.name}}">{{variable.name}}</label>
+                <br>
+              {% endfor %}
+            </div>
+            <div class="numerical_variables_picklist_div" id = "numerical_variables_picklist_div">
+              <h5>Pick an Numerical variable from the picklist</h5>
+              <select class="numerical_variables_picklist" name="numerical_variables_picklist" id = "numerical_variables_picklist">
+                <option value=""></option>
+                {% for variable in numerical_variables %}
+                  <option value="{{variable.name}}">{{variable.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="aggregateFunc_div" id = "aggregateFunc_div">
+              <h5>Pick an Aggregate function from the picklist</h5><br>
+              <select class="aggregateFunc" name="aggregateFunc" id = "aggregateFunc">
+                <option value=""></option>
+                {% for funs in aggrfuns %}
+                  <option value="{{funs.name}}">{{funs.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <br><br>
+
+          <input class="btn btn-primary" type="submit" name="" value="Submit">
+        </form>
+      </div>
+
+
+      <script type="text/javascript">
+        function askVariables(plots)
+        {
+          var selectedPlot = plots.options[plots.selectedIndex].value;
+          if (selectedPlot == "Box_Plot")
+          {
+
+            document.getElementById("selectVariables").style.display = "block";
+            document.getElementById("numerical_variables_checkbox").style.display = "block";
+            document.getElementById("numerical_variables_picklist_div").style.display = "none";
+            document.getElementById("categorical_variables_picklist_div").style.display = "none";
+            document.getElementById("categorical_variables_checkbox").style.display = "none";
+            document.getElementById("aggregateFunc_div").style.display = "none";
+          }
+          if (selectedPlot == "Count_Plot")
+          {
+
+            document.getElementById("selectVariables").style.display = "block";
+            document.getElementById("numerical_variables_checkbox").style.display = "none";
+            document.getElementById("numerical_variables_picklist_div").style.display = "none";
+            document.getElementById("categorical_variables_picklist_div").style.display = "none";
+            document.getElementById("categorical_variables_checkbox").style.display = "block";
+            document.getElementById("aggregateFunc_div").style.display = "none";
+          }
+          if (selectedPlot == "Bar_Chart")
+          {
+
+            document.getElementById("selectVariables").style.display = "block";
+            document.getElementById("numerical_variables_checkbox").style.display = "none";
+            document.getElementById("numerical_variables_picklist_div").style.display = "block";
+            document.getElementById("categorical_variables_picklist_div").style.display = "none";
+            document.getElementById("categorical_variables_checkbox").style.display = "block";
+            document.getElementById("aggregateFunc_div").style.display = "block";
+          }
+          if (selectedPlot == "Pie_Chart")
+          {
+            document.getElementById("selectVariables").style.display = "block";
+            document.getElementById("numerical_variables_checkbox").style.display = "none";
+            document.getElementById("numerical_variables_picklist_div").style.display = "block";
+            document.getElementById("categorical_variables_picklist_div").style.display = "none";
+            document.getElementById("categorical_variables_checkbox").style.display = "block";
+            document.getElementById("aggregateFunc_div").style.display = "block";
+          }
+          if (selectedPlot == "")
+          {
+            document.getElementById("custom_message").style.display = "none";
+          }
+        }
+      </script>
+
+  </body>
+</html>
